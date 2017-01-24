@@ -466,15 +466,25 @@ public class Table
 
     /************************************************************************************
      * Check the size of the tuple (number of elements in list) as well as the type of
-     * each value to ensure it is from the right domain. 
+     * each value to ensure it is from the right domain.
+     *
+     * @author Anthony Zheng
      *
      * @param t  the tuple as a list of attribute values
      * @return  whether the tuple has the right size and values that comply
      *          with the given domains
      */
     private boolean typeCheck (Comparable [] t)
-    { 
-        //  T O   B E   I M P L E M E N T E D 
+    {
+        if (t.length != attribute.length)
+            return false;
+
+        // Compare each thing in tuple with corresponding domain
+        for (int i = 0; i < t.length; i++) {
+            if (!((Object)t[i]).getClass().getSimpleName().equals(domain[i])) {
+                return false;
+            }
+        }
 
         return true;
     } // typeCheck
