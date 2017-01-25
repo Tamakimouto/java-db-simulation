@@ -140,8 +140,25 @@ public class Table
         String [] newKey    = (Arrays.asList (attrs).containsAll (Arrays.asList (key))) ? key : attrs;
 
         List <Comparable []> rows = new ArrayList <> ();
+        List <KeyType> addedKeys = new ArrayList<> ();
 
-        //  T O   B E   I M P L E M E N T E D 
+        for (Comparable [] row : tuples) {
+
+            Comparable [] newRow = this.extract(row, attrs);
+            KeyType currentKey = new KeyType(newRow);
+
+            Boolean duplicateKey = false;
+
+            for (KeyType oldKey : addedKeys) {
+                if (currentKey == oldKey)
+                    duplicateKey = true;
+            }
+
+            if (!duplicateKey) {
+                rows.add(newRow);
+                addedKeys.add(currentKey);
+            }
+        }
 
         return new Table (name + count++, attrs, colDomain, newKey, rows);
     } // project
@@ -244,16 +261,19 @@ public class Table
 
         List <Comparable []> rows = new ArrayList <> ();
 
-        for (Comparable [] tup: tuples){
+        for (Comparable [] tup: tuples) {
             Comparable [] temp = new Comparable[this.attribute.length + table2.attribute.length];
-            for(Comparable [] tup2 : table2.tuples){
-                for(int i = 0; i < t_attrs.length; i++){
-                    if(tup[this.col(t_attrs[i])] == tup2[table2.col(u_attrs[i])]){
+            for (Comparable [] tup2 : table2.tuples) {
+                for(int i = 0; i < t_attrs.length; i++) {
+
+                    if(tup[this.col(t_attrs[i])] == tup2[table2.col(u_attrs[i])]) {
                         int tup_count = 0;
+
                         for(int j = 0; j < this.attribute.length; j++){
                             temp[j] = tup[j];
                         }
-                        for(int j = this.attribute.length; j < this.attribute.length + table2.attribute.length; j++){
+
+                        for (int j = this.attribute.length; j < this.attribute.length + table2.attribute.length; j++) {
                             temp[j] = tup2[tup_count];
                             tup_count++;
                         }
