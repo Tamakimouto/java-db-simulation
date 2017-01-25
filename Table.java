@@ -20,26 +20,26 @@ import static java.lang.System.out;
  * Missing are update and delete data manipulation operators.
  */
 public class Table
-       implements Serializable
+    implements Serializable
 {
     /** Relative path for storage directory
-     */
+    */
     private static final String DIR = "store" + File.separator;
 
     /** Filename extension for database files
-     */
+    */
     private static final String EXT = ".dbf";
 
     /** Counter for naming temporary tables.
-     */
+    */
     private static int count = 0;
 
     /** Table name.
-     */
+    */
     private final String name;
 
     /** Array of attribute names.
-     */
+    */
     private final String [] attribute;
 
     /** Array of attribute domains: a domain may be
@@ -50,15 +50,15 @@ public class Table
     private final Class [] domain;
 
     /** Collection of tuples (data storage).
-     */
+    */
     private final List <Comparable []> tuples;
 
     /** Primary key. 
-     */
+    */
     private final String [] key;
 
     /** Index into tuples (maps key to tuple number).
-     */
+    */
     private final Map <KeyType, Comparable []> index;
 
     //----------------------------------------------------------------------------------
@@ -95,7 +95,7 @@ public class Table
      * @param _tuple      the list of tuples containing the data
      */  
     public Table (String _name, String [] _attribute, Class [] _domain, String [] _key,
-                  List <Comparable []> _tuples)
+            List <Comparable []> _tuples)
     {
         name      = _name;
         attribute = _attribute;
@@ -159,8 +159,8 @@ public class Table
         out.println ("RA> " + name + ".select (" + predicate + ")");
 
         return new Table (name + count++, attribute, domain, key,
-                   tuples.stream ().filter (t -> predicate.test (t))
-                                   .collect (Collectors.toList ()));
+                tuples.stream ().filter (t -> predicate.test (t))
+                .collect (Collectors.toList ()));
     } // select
 
     /************************************************************************************
@@ -237,34 +237,34 @@ public class Table
     public Table join (String attributes1, String attributes2, Table table2)
     {
         out.println ("RA> " + name + ".join (" + attributes1 + ", " + attributes2 + ", "
-                                               + table2.name + ")");
+                + table2.name + ")");
 
         String [] t_attrs = attributes1.split (" ");
         String [] u_attrs = attributes2.split (" ");
 
         List <Comparable []> rows = new ArrayList <> ();
 
-	for (Comparable [] tup: tuples){
-    		Comparable [] temp = new Comparable[this.attribute.length + table2.attribute.length];
-    		for(Comparable [] tup2 : table2.tuples){
-    			for(int i = 0; i < t_attrs.length; i++){
-    				if(tup[this.col(t_attrs[i])] == tup2[table2.col(u_attrs[i])]){
-    					int tup_count = 0;
-    					for(int j = 0; j < this.attribute.length; j++){
-    						temp[j] = tup[j];
-	    				}
-	    				for(int j = this.attribute.length; j < this.attribute.length + table2.attribute.length; j++){
-	    					temp[j] = tup2[tup_count];
-	    					tup_count++;
-	    				}
-    				}
-    			}
-    		}
-    			rows.add(temp);
+        for (Comparable [] tup: tuples){
+            Comparable [] temp = new Comparable[this.attribute.length + table2.attribute.length];
+            for(Comparable [] tup2 : table2.tuples){
+                for(int i = 0; i < t_attrs.length; i++){
+                    if(tup[this.col(t_attrs[i])] == tup2[table2.col(u_attrs[i])]){
+                        int tup_count = 0;
+                        for(int j = 0; j < this.attribute.length; j++){
+                            temp[j] = tup[j];
+                        }
+                        for(int j = this.attribute.length; j < this.attribute.length + table2.attribute.length; j++){
+                            temp[j] = tup2[tup_count];
+                            tup_count++;
+                        }
+                    }
+                }
+            }
+            rows.add(temp);
         }
 
         return new Table (name + count++, ArrayUtil.concat (attribute, table2.attribute),
-                                          ArrayUtil.concat (domain, table2.domain), key, rows);
+                ArrayUtil.concat (domain, table2.domain), key, rows);
     } // join
 
     /************************************************************************************
@@ -287,7 +287,7 @@ public class Table
 
         // FIX - eliminate duplicate columns
         return new Table (name + count++, ArrayUtil.concat (attribute, table2.attribute),
-                                          ArrayUtil.concat (domain, table2.domain), key, rows);
+                ArrayUtil.concat (domain, table2.domain), key, rows);
     } // join
 
     /************************************************************************************
@@ -299,7 +299,7 @@ public class Table
     public int col (String attr)
     {
         for (int i = 0; i < attribute.length; i++) {
-           if (attr.equals (attribute [i])) return i;
+            if (attr.equals (attribute [i])) return i;
         } // for
 
         return -1;  // not found
@@ -498,7 +498,7 @@ public class Table
 
         // Compare each thing in tuple with corresponding domain
         for (int i = 0; i < t.length; i++) {
-            if (!((Object)t[i]).getClass().getSimpleName().equals(domain[i])) {
+            if (!((Object)t[i]).getClass().getSimpleName().equals(domain[i].getSimpleName())) {
                 return false;
             }
         }
