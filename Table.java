@@ -2,7 +2,7 @@
 /****************************************************************************************
  * @file  Table.java
  *
- * @author   John Miller
+ * @author   John Miller, Emily Jackson, Jacob Shaw, Kathryn Soll, Anthony Zheng
  */
 
 import java.io.*;
@@ -126,6 +126,8 @@ public class Table
     /************************************************************************************
      * Project the tuples onto a lower dimension by keeping only the given attributes.
      * Check whether the original key is included in the projection.
+     *
+     * @author Anthony Zheng
      *
      * #usage movie.project ("title year studioNo")
      *
