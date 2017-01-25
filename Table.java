@@ -142,7 +142,7 @@ public class Table
         String [] newKey    = (Arrays.asList (attrs).containsAll (Arrays.asList (key))) ? key : attrs;
 
         List <Comparable []> rows = new ArrayList <> ();
-        List <KeyType> addedKeys = new ArrayList<> ();
+        List <KeyType> addedKeys = new ArrayList <> ();
 
         for (Comparable [] row : tuples) {
 
