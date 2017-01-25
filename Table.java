@@ -244,7 +244,24 @@ public class Table
 
         List <Comparable []> rows = new ArrayList <> ();
 
-        //  T O   B E   I M P L E M E N T E D 
+	for (Comparable [] tup: tuples){
+    		Comparable [] temp = new Comparable[this.attribute.length + table2.attribute.length];
+    		for(Comparable [] tup2 : table2.tuples){
+    			for(int i = 0; i < t_attrs.length; i++){
+    				if(tup[this.col(t_attrs[i])] == tup2[table2.col(u_attrs[i])]){
+    					int tup_count = 0;
+    					for(int j = 0; j < this.attribute.length; j++){
+    						temp[j] = tup[j];
+	    				}
+	    				for(int j = this.attribute.length; j < this.attribute.length + table2.attribute.length; j++){
+	    					temp[j] = tup2[tup_count];
+	    					tup_count++;
+	    				}
+    				}
+    			}
+    		}
+    			rows.add(temp);
+        }
 
         return new Table (name + count++, ArrayUtil.concat (attribute, table2.attribute),
                                           ArrayUtil.concat (domain, table2.domain), key, rows);
