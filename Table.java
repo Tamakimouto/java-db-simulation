@@ -305,7 +305,53 @@ public class Table
 
         List <Comparable []> rows = new ArrayList <> ();
 
-        //  T O   B E   I M P L E M E N T E D 
+        int attr_length = this.attribute.length + table2.attribute.length; // potential length of temp array
+    	int [] row_shares = new int [table2.attribute.length]; //location of shared attributes in table2
+        for(int i = 0; i < this.attribute.length; i++){
+        	for(int j = 0; j < table2.attribute.length; j++){
+        		if(this.attribute[i].equals(table2.attribute[j])){
+        		attr_length--; // column reduction due to shared attributes
+        		row_shares[j] = 1;// setting a flag at the shared attribute location
+        		}
+        	}
+        }
+        if(attr_length == this.attribute.length + table2.attribute.length){
+        	out.println("No detected shared attributes between tables, try again with another table");
+        	return this;
+        }
+        for(Comparable[] tup : tuples){
+        	Comparable [] temp = new Comparable[attr_length];
+        		for(int i = 0; i < this.attribute.length; i++){
+    				temp[i] = tup[i];
+    				if(this.attribute.length != attr_length){// are their new columns being added
+	    				for(Comparable[] tup2 : table2.tuples){
+	    					int tup_count = 0;
+	    					for( int j = this.attribute.length; j < this.attribute.length + table2.attribute.length; j++){
+	    		        		out.println(row_shares[tup_count]);
+	    						if(row_shares[tup_count] == 1){
+	    		        			out.println("shared an attribute");
+	    		        			if(tup[i].equals(tup2[tup_count])){
+	    		        				out.println("data match");
+	    		        				temp[j] = tup2[tup_count++];
+	    		        			}
+	    		        		}
+	    		        	}
+		    			}
+    				}			
+        		}
+        		for(Comparable[] tup2 : table2.tuples){
+        			int tup_count = 0;
+        			if(row_shares[tup_count] == 1){
+        				for(int j = 0; j < this.attribute.length; j++){
+	        				if(temp[j].equals(tup2[tup_count])){
+	        					rows.add(temp);
+	        				}
+        				}
+        			tup_count++;
+        			}
+        		}
+        }
+
 
         // FIX - eliminate duplicate columns
         return new Table (name + count++, ArrayUtil.concat (attribute, table2.attribute),
