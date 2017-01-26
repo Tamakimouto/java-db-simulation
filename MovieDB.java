@@ -12,12 +12,11 @@ import static java.lang.System.out;
  * databases.  See "Database Systems: The Complete Book", second edition, page 26 for more
  * information on the Movie Database schema.
  */
-class MovieDB
-{
     /*************************************************************************************
      * Main method for creating, populating and querying a Movie Database.
      * @param args  the command-line arguments
      */
+class MovieDB {    
     public static void main (String [] args)
     {
         out.println ();
@@ -146,5 +145,4 @@ class MovieDB
 
     } // main
 
-} // MovieDB class
-
+}

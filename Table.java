@@ -2,7 +2,7 @@
 /****************************************************************************************
  * @file  Table.java
  *
- * @author   John Miller
+ * @author   John Miller, Emily Jackson, Jacob Shaw, Kathryn Soll, Anthony Zheng
  */
 
 import java.io.*;
@@ -20,26 +20,26 @@ import static java.lang.System.out;
  * Missing are update and delete data manipulation operators.
  */
 public class Table
-       implements Serializable
+    implements Serializable
 {
     /** Relative path for storage directory
-     */
+    */
     private static final String DIR = "store" + File.separator;
 
     /** Filename extension for database files
-     */
+    */
     private static final String EXT = ".dbf";
 
     /** Counter for naming temporary tables.
-     */
+    */
     private static int count = 0;
 
     /** Table name.
-     */
+    */
     private final String name;
 
     /** Array of attribute names.
-     */
+    */
     private final String [] attribute;
 
     /** Array of attribute domains: a domain may be
@@ -50,15 +50,15 @@ public class Table
     private final Class [] domain;
 
     /** Collection of tuples (data storage).
-     */
+    */
     private final List <Comparable []> tuples;
 
     /** Primary key. 
-     */
+    */
     private final String [] key;
 
     /** Index into tuples (maps key to tuple number).
-     */
+    */
     private final Map <KeyType, Comparable []> index;
 
     //----------------------------------------------------------------------------------
@@ -95,7 +95,7 @@ public class Table
      * @param _tuple      the list of tuples containing the data
      */  
     public Table (String _name, String [] _attribute, Class [] _domain, String [] _key,
-                  List <Comparable []> _tuples)
+            List <Comparable []> _tuples)
     {
         name      = _name;
         attribute = _attribute;
@@ -127,6 +127,8 @@ public class Table
      * Project the tuples onto a lower dimension by keeping only the given attributes.
      * Check whether the original key is included in the projection.
      *
+     * @author Anthony Zheng
+     *
      * #usage movie.project ("title year studioNo")
      *
      * @param attributes  the attributes to project onto
@@ -140,8 +142,25 @@ public class Table
         String [] newKey    = (Arrays.asList (attrs).containsAll (Arrays.asList (key))) ? key : attrs;
 
         List <Comparable []> rows = new ArrayList <> ();
+        List <KeyType> addedKeys = new ArrayList <> ();
 
-        //  T O   B E   I M P L E M E N T E D 
+        for (Comparable [] row : tuples) {
+
+            Comparable [] newRow = this.extract(row, attrs);
+            KeyType currentKey = new KeyType(newRow);
+
+            Boolean duplicateKey = false;
+
+            for (KeyType oldKey : addedKeys) {
+                if (currentKey == oldKey)
+                    duplicateKey = true;
+            }
+
+            if (!duplicateKey) {
+                rows.add(newRow);
+                addedKeys.add(currentKey);
+            }
+        }
 
         return new Table (name + count++, attrs, colDomain, newKey, rows);
     } // project
@@ -159,8 +178,8 @@ public class Table
         out.println ("RA> " + name + ".select (" + predicate + ")");
 
         return new Table (name + count++, attribute, domain, key,
-                   tuples.stream ().filter (t -> predicate.test (t))
-                                   .collect (Collectors.toList ()));
+                tuples.stream ().filter (t -> predicate.test (t))
+                .collect (Collectors.toList ()));
     } // select
 
     /************************************************************************************
@@ -248,17 +267,37 @@ public class Table
     public Table join (String attributes1, String attributes2, Table table2)
     {
         out.println ("RA> " + name + ".join (" + attributes1 + ", " + attributes2 + ", "
-                                               + table2.name + ")");
+                + table2.name + ")");
 
         String [] t_attrs = attributes1.split (" ");
         String [] u_attrs = attributes2.split (" ");
 
         List <Comparable []> rows = new ArrayList <> ();
 
-        //  T O   B E   I M P L E M E N T E D 
+        for (Comparable [] tup: tuples) {
+            Comparable [] temp = new Comparable[this.attribute.length + table2.attribute.length];
+            for (Comparable [] tup2 : table2.tuples) {
+                for(int i = 0; i < t_attrs.length; i++) {
+
+                    if(tup[this.col(t_attrs[i])] == tup2[table2.col(u_attrs[i])]) {
+                        int tup_count = 0;
+
+                        for(int j = 0; j < this.attribute.length; j++){
+                            temp[j] = tup[j];
+                        }
+
+                        for (int j = this.attribute.length; j < this.attribute.length + table2.attribute.length; j++) {
+                            temp[j] = tup2[tup_count];
+                            tup_count++;
+                        }
+                    }
+                }
+            }
+            rows.add(temp);
+        }
 
         return new Table (name + count++, ArrayUtil.concat (attribute, table2.attribute),
-                                          ArrayUtil.concat (domain, table2.domain), key, rows);
+                ArrayUtil.concat (domain, table2.domain), key, rows);
     } // join
 
     /************************************************************************************
@@ -277,11 +316,57 @@ public class Table
 
         List <Comparable []> rows = new ArrayList <> ();
 
-        //  T O   B E   I M P L E M E N T E D 
+        int attr_length = this.attribute.length + table2.attribute.length; // potential length of temp array
+    	int [] row_shares = new int [table2.attribute.length]; //location of shared attributes in table2
+        for(int i = 0; i < this.attribute.length; i++){
+        	for(int j = 0; j < table2.attribute.length; j++){
+        		if(this.attribute[i].equals(table2.attribute[j])){
+        		attr_length--; // column reduction due to shared attributes
+        		row_shares[j] = 1;// setting a flag at the shared attribute location
+        		}
+        	}
+        }
+        if(attr_length == this.attribute.length + table2.attribute.length){
+        	out.println("No detected shared attributes between tables, try again with another table");
+        	return this;
+        }
+        for(Comparable[] tup : tuples){
+        	Comparable [] temp = new Comparable[attr_length];
+        		for(int i = 0; i < this.attribute.length; i++){
+    				temp[i] = tup[i];
+    				if(this.attribute.length != attr_length){// are their new columns being added
+	    				for(Comparable[] tup2 : table2.tuples){
+	    					int tup_count = 0;
+	    					for( int j = this.attribute.length; j < this.attribute.length + table2.attribute.length; j++){
+	    		        		out.println(row_shares[tup_count]);
+	    						if(row_shares[tup_count] == 1){
+	    		        			out.println("shared an attribute");
+	    		        			if(tup[i].equals(tup2[tup_count])){
+	    		        				out.println("data match");
+	    		        				temp[j] = tup2[tup_count++];
+	    		        			}
+	    		        		}
+	    		        	}
+		    			}
+    				}			
+        		}
+        		for(Comparable[] tup2 : table2.tuples){
+        			int tup_count = 0;
+        			if(row_shares[tup_count] == 1){
+        				for(int j = 0; j < this.attribute.length; j++){
+	        				if(temp[j].equals(tup2[tup_count])){
+	        					rows.add(temp);
+	        				}
+        				}
+        			tup_count++;
+        			}
+        		}
+        }
+
 
         // FIX - eliminate duplicate columns
         return new Table (name + count++, ArrayUtil.concat (attribute, table2.attribute),
-                                          ArrayUtil.concat (domain, table2.domain), key, rows);
+                ArrayUtil.concat (domain, table2.domain), key, rows);
     } // join
 
     /************************************************************************************
@@ -293,7 +378,7 @@ public class Table
     public int col (String attr)
     {
         for (int i = 0; i < attribute.length; i++) {
-           if (attr.equals (attribute [i])) return i;
+            if (attr.equals (attribute [i])) return i;
         } // for
 
         return -1;  // not found
@@ -477,15 +562,25 @@ public class Table
 
     /************************************************************************************
      * Check the size of the tuple (number of elements in list) as well as the type of
-     * each value to ensure it is from the right domain. 
+     * each value to ensure it is from the right domain.
+     *
+     * @author Anthony Zheng
      *
      * @param t  the tuple as a list of attribute values
      * @return  whether the tuple has the right size and values that comply
      *          with the given domains
      */
     private boolean typeCheck (Comparable [] t)
-    { 
-        //  T O   B E   I M P L E M E N T E D 
+    {
+        if (t.length != attribute.length)
+            return false;
+
+        // Compare each thing in tuple with corresponding domain
+        for (int i = 0; i < t.length; i++) {
+            if (!((Object)t[i]).getClass().getSimpleName().equals(domain[i].getSimpleName())) {
+                return false;
+            }
+        }
 
         return true;
     } // typeCheck
