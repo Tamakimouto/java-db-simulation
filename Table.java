@@ -222,11 +222,17 @@ public class Table
     public Table union (Table table2)
     {
         out.println ("RA> " + name + ".union (" + table2.name + ")");
-        if (! compatible (table2)) return null;
+        if (! compatible (table2)) 
+			return null;
 
         List <Comparable []> rows = new ArrayList <> ();
 
-        //  T O   B E   I M P L E M E N T E D 
+		for (Comparable [] tup: tuples)
+        	rows.add(tup);
+      
+        for (Comparable [] tup: table2.tuples)
+        	rows.add(tup);
+        
 
         return new Table (name + count++, attribute, domain, key, rows);
     } // union
@@ -243,11 +249,21 @@ public class Table
     public Table minus (Table table2)
     {
         out.println ("RA> " + name + ".minus (" + table2.name + ")");
-        if (! compatible (table2)) return null;
+        if (! compatible (table2)) 
+			return null;
 
         List <Comparable []> rows = new ArrayList <> ();
 
-        //  T O   B E   I M P L E M E N T E D 
+        for (Comparable [] tup: tuples){
+    		boolean b = true;
+			
+    		for(Comparable [] tup2 : table2.tuples){
+    			if(tup.equals(tup2)) 
+					b = false;
+			}
+    		if(b == true) 
+				rows.add(tup);
+    	}
 
         return new Table (name + count++, attribute, domain, key, rows);
     } // minus
