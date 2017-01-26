@@ -169,14 +169,25 @@ public class Table
      *
      * @param keyVal  the given key value
      * @return  a table with the tuple satisfying the key predicate
+     * @author Jacob Shaw
      */
     public Table select (KeyType keyVal)
     {
         out.println ("RA> " + name + ".select (" + keyVal + ")");
 
+	/**
+	 * Creates a new ArrayList to store the selected rows
+	 */
+
         List <Comparable []> rows = new ArrayList <> ();
 
-        //  T O   B E   I M P L E M E N T E D 
+	/**
+	 * Traverses the mapped index to find the tuple containing the keyVal
+	 */
+
+        for (Map.Entry <KeyType, Comparable []> e : index.entrySet ()) {
+            if (e.getKey().equals(keyVal)) rows.add(e.getValue());
+        } 
 
         return new Table (name + count++, attribute, domain, key, rows);
     } // select
