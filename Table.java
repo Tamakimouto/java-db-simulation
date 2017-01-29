@@ -168,6 +168,8 @@ public class Table
     /************************************************************************************
      * Select the tuples satisfying the given predicate (Boolean function).
      *
+     * @author Jacob Shaw
+     *
      * #usage movie.select (t -> t[movie.col("year")].equals (1977))
      *
      * @param predicate  the check condition for tuples
@@ -214,6 +216,8 @@ public class Table
     /************************************************************************************
      * Union this table and table2.  Check that the two tables are compatible.
      *
+     * @author Kathryn Soll
+     * 
      * #usage movie.union (show)
      *
      * @param table2  the rhs table in the union operation
@@ -240,6 +244,8 @@ public class Table
     /************************************************************************************
      * Take the difference of this table and table2.  Check that the two tables are
      * compatible.
+     *
+     * @author Kathryn Soll
      *
      * #usage movie.minus (show)
      *
@@ -272,6 +278,8 @@ public class Table
      * Join this table and table2 by performing an "equi-join".  Tuples from both tables
      * are compared requiring attributes1 to equal attributes2.  Disambiguate attribute
      * names by append "2" to the end of any duplicate attribute name.
+     *
+     * @author Emily Jackson
      *
      * #usage movie.join ("studioNo", "name", studio)
      *
@@ -320,6 +328,8 @@ public class Table
      * Join this table and table2 by performing an "natural join".  Tuples from both tables
      * are compared requiring common attributes to be equal.  The duplicate column is also
      * eliminated.
+     *
+     * @author Emily Jackson
      *
      * #usage movieStar.join (starsIn)
      *
